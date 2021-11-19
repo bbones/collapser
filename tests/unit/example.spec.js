@@ -1,12 +1,29 @@
-import { shallowMount } from '@vue/test-utils'
-import HelloWorld from '@/components/HelloWorld.vue'
+import { mount, createLocalVue } from '@vue/test-utils';
+import HelloWorld from '@/components/HelloWorld.vue';
+import { BootstrapVue } from 'bootstrap-vue';
+
+const localVue = createLocalVue();
+localVue.use(BootstrapVue);
 
 describe('HelloWorld.vue', () => {
-  it('renders props.msg when passed', () => {
-    const msg = 'new message'
-    const wrapper = shallowMount(HelloWorld, {
-      propsData: { msg }
+
+  let wrapper;
+
+  beforeEach(() => {
+    wrapper = mount(HelloWorld, {
+      localVue: localVue,
     })
-    expect(wrapper.text()).toMatch(msg)
+  })
+
+  it('renders visible collapse component', async () => {
+    let openButton = wrapper.find("#open")
+    let collapsible = wrapper.find("#my-collapse")
+    console.log(collapsible.element.style);
+    console.log(collapsible.isVisible());
+
+    await openButton.trigger("click");
+
+    console.log(collapsible.element.style);
+    console.log(collapsible.isVisible());
   })
 })
