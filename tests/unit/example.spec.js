@@ -1,29 +1,50 @@
-import { mount, createLocalVue } from '@vue/test-utils';
+import {mount, createLocalVue, createWrapper} from '@vue/test-utils';
 import HelloWorld from '@/components/HelloWorld.vue';
-import { BootstrapVue } from 'bootstrap-vue';
+import {BootstrapVue, VBToggle} from 'bootstrap-vue';
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 
+
 describe('HelloWorld.vue', () => {
 
-  let wrapper;
+    let wrapper;
 
-  beforeEach(() => {
-    wrapper = mount(HelloWorld, {
-      localVue: localVue,
+    beforeEach(() => {
+        wrapper = mount(HelloWorld, {
+            localVue: localVue,
+            global: {
+                directives: {
+                    VBToggle
+                }
+            }
+        })
     })
-  })
 
-  it('renders visible collapse component', async () => {
-    let openButton = wrapper.find("#open")
-    let collapsible = wrapper.find("#my-collapse")
-    console.log(collapsible.element.style);
-    console.log(collapsible.isVisible());
+    it.skip("listens to root toggle event", async () => {
+        let collapsible = wrapper.find("#my-collapse")
+        expect(collapsible.isVisible()).toBeTruthy();
 
-    await openButton.trigger("click");
+        await wrapper.vm.$root.$emit('bv::toggle::collapse', 'my-collapse')
+        expect(collapsible.isVisible()).toBeFalsy();
 
-    console.log(collapsible.element.style);
-    console.log(collapsible.isVisible());
-  })
+        await wrapper.vm.$root.$emit('bv::toggle::collapse', 'my-collapse')
+        expect(collapsible.isVisible()).toBeTruthy();
+
+    });
+
+    it('renders visible collapse component', async () => {
+        const rootWrapper = createWrapper(wrapper.vm.$root)
+        let openButton = wrapper.find("#open")
+        let collapsible = wrapper.find("#my-collapse")
+
+        expect(collapsible.isVisible()).toBeTruthy();
+
+        await openButton.trigger("click");
+
+        console.log(rootWrapper.emitted())
+
+        expect(collapsible.isVisible()).toBeFalsy();
+
+    })
 })
